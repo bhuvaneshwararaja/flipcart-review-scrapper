@@ -4,6 +4,7 @@ import {useLocation,useParams} from "react-router-dom"
 import Pagination from '@material-ui/lab/Pagination';
 import { Navbar } from "../../Components/Navbar";
 import StarIcon from "@material-ui/icons/Star";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 const useStyles = makeStyles((theme) => ({
    container: {
     width:"100%",
@@ -15,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     
    },
    reviewcontainer:{
-       width:"80%",
+       width:"100%",
        minHeight:"inherit",
        background:"#fff",
        display: "flex",
@@ -31,16 +32,18 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
    },
    sidecontainer:{
-    width: "20% !important", 
-    height:"45vh",
-    borderBottom: "1px solid rgba(0,0,0,.1)"
+    width: "33% !important", 
+    minHeight:"45vh",
+    borderBottom: "1px solid rgba(0,0,0,.1)",
+    position:"relative",
+    top:"10rem"
    },
    details:{
        display:"flex",
        flexDirection:"column",
        alignItems: "center",
        justifyContent:"space-around",
-       height:"40vh"
+       minHeight:"40vh"
    },
    allreview:{
    width:"80%",
@@ -59,7 +62,8 @@ const useStyles = makeStyles((theme) => ({
    ratting:{
        display:"flex",
        padding:"24px",
-       alignItems:"center"
+       alignItems:"center",
+       flexDirection:"column"
    }
 }))
 const GlobalCss = withStyles({
@@ -135,32 +139,38 @@ export const ProductPage = () => {
     <Box className={classes.container}>
         <div className={classes.reviewcontainer}>
             <div className={classes.sidecontainer}>
-                {productdata ? (<>
+                {productdata &&reviews ? (<>
                     
                    <div className={classes.details}>
                       <div style={{"textAlign":"center"}}>
                       <img src={productdata[2].productImage} width="100px"  alt=""></img>
                       </div>
                    <Typography variant="h6" component="h6" >{productdata[0].productName.slice(0,70)}...</Typography>
-                   <Typography variant="body2">
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                background: "#388e3c",
-                                color: "#fff",
-                                padding: "0.1rem .4rem 0rem 0.6rem",
-                                borderRadius: "10px",
-                              }}
-                            >
-                              {productdata[5].productRatings[0].overallRating}{" "}
-                              <StarIcon style={{ height: "1.2rem" }} />
-                            </span>{" "}
-                            {productdata[5].productRatings[0].ratingCount}{" "}
-                            {productdata[5].productRatings[0].reviewCount}
-                          </Typography>
+                 
+                          <div className={classes.ratting}>
+                    <div style={{"display":"flex","alignItems":"center"}}>
+                        <Typography variant="h5" display="flex" minHeight="5vh" flexDirection="column">{productdata[5].productRatings[0].overallRating} <StarIcon style={{ height: "1.2rem" }} /></Typography>
+                        <Typography variant="body2">{productdata[5].productRatings[0].ratingCount}{" "}
+                            {productdata[5].productRatings[0].reviewCount}</Typography>
+                    </div>
+                    <ul>
+                    {Object.keys(productdata[5].productRatings[1]).reverse().map((value,index) => {
+                        console.log(Math.round(parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[index].split(",").join(""))/parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[0].split(",").join(""))*100))
+                        return <> 
+                        
+                            <li className={classes.ratelist}>
+                                <Typography variant="h5">{value} <StarIcon style={{ height: "1.2rem" }} /></Typography>
+                                <LinearProgress variant="determinate" value={Math.round(parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[index].split(",").join(""))/parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[0].split(",").join(""))*100)} ></LinearProgress>
+                                <Typography variant="body2">{Object.values(productdata[5].productRatings[1]).reverse()[index]}</Typography>
+                            </li>
+                        </>
+                    })}
+                    </ul>
+                </div> 
                    </div>
                   
                 </>):""}
+                
             </div>
             <div className={classes.allreview}>
                {productdata && reviews ? (<>
@@ -168,7 +178,7 @@ export const ProductPage = () => {
                     <Typography variant="h5" component="h2" style={{"borderBottom":"1px solid rgba(0,0,0,.1)","padding": "24px 0 24px 24px"}}>{productdata[0].productName} Reviews</Typography>
 
                 </div>
-                <div className={classes.ratting}>
+                {/* <div className={classes.ratting}>
                     <div style={{"width":"10%"}}>
                         <Typography variant="h5" display="flex" minHeight="5vh" flexDirection="column">{productdata[5].productRatings[0].overallRating} <StarIcon style={{ height: "1.2rem" }} /></Typography>
                         <Typography variant="body2">{productdata[5].productRatings[0].ratingCount}{" "}
@@ -187,6 +197,38 @@ export const ProductPage = () => {
                         </>
                     })}
                     </ul>
+                </div> */}
+                <div style={{"padding":"24px","marginBottom":"8rem"}}>
+                    {productdata && reviews ? (<>
+                        {reviews[page-1].map((review,index) => {
+                            return <>
+                            <div style={{"borderBottom":"1px solid rgba(0,0,0,.1","margin":"1rem 0rem"}}>
+                            <div style={{"display":"flex"}}>
+                            <Typography variant="body2">
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                background: "#388e3c",
+                                color: "#fff",
+                                padding: "0.1rem .4rem 0rem 0.6rem",
+                                borderRadius: "10px",
+                              }}
+                            >
+                              {review.Rating}{" "}
+                              <StarIcon style={{ height: "1.2rem" }} />
+                            </span>{" "}
+                           
+                          </Typography>
+                            <Typography variant="h5" style={{"fontSize":"1.3rem","marginLeft":"1rem"}}>{review.CommentHead}</Typography>
+                            </div>
+                            <Typography variant="body2" style={{"fontWeight":"300","fontSize":"1rem","lineHeight":"2rem","margin":".5rem 0rem"}}>{review.Comment}</Typography>
+                            <Typography variant="body1" style={{"marginBottom":".5rem","display":"flex","alignItems":"center","color":"dimgray"}}>{review.Name} <CheckCircleIcon style={{ height: "1rem" }} /> certified Buyer</Typography>
+                            </div>
+                           
+                            </>
+                        })}
+                    
+                    </>):""}
                 </div>
                </>):""}
             </div>
