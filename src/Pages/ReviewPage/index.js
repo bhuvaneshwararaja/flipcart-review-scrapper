@@ -1,5 +1,6 @@
 import { Navbar } from "../../Components/Navbar";
 import { useState, useEffect } from "react";
+import {useHistory,Link} from "react-router-dom"
 import {
   InputBase,
   withStyles,
@@ -89,8 +90,9 @@ const GlobalCss = withStyles({
 })(() => null);
 
 export const ReviewPage = () => {
+  const history = useHistory()
   const [query, setQuery] = useState();
-  console.log(query);
+
   const OnInput = (e) => {
     setQuery(e.target.value);
   };
@@ -114,7 +116,6 @@ export const ReviewPage = () => {
       })
       .then((res) => {
         setLoading(false);
-        console.log(res);
         if (res.mess) setError(res.mess);
         else if (res) {
           setSearchData(Object.values(res));
@@ -122,8 +123,6 @@ export const ReviewPage = () => {
         }
       });
   };
-
-  console.log(error);
 
   const classes = useStyles();
 
@@ -156,15 +155,15 @@ export const ReviewPage = () => {
               marginTop="1rem"
             >
               {searchdata.map((item, index) => {
-                console.log(item);
-                if (index < item.length) {
-                  console.log(Object.keys(item[3].prductHighlights[0]));
+               
+                  
                   return (
                     <>
                       <div className={classes.tileflex}>
                         <img
                           src={item[2].productImage}
                           style={{ width: "100px" }}
+                          alt=""
                         ></img>
                         <div style={{ width: "50%" }}>
                           <Typography component="h2" variant="h5">
@@ -199,13 +198,12 @@ export const ReviewPage = () => {
                           </ul>
                         </div>
                         <div>
-                          <Button color="primary">Check Reviews</Button>
+                          <Link to={`product/${productids[index]}`}>Check Review</Link>
                         </div>
                       </div>
                       <hr style={{ opacity: ".2" }}></hr>
                     </>
                   );
-                }
               })}
             </Box>
           </>
