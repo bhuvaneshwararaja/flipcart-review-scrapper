@@ -1,10 +1,92 @@
+import { Box, makeStyles,Typography,withStyles,LinearProgress } from "@material-ui/core";
 import { useEffect,useState } from "react";
 import {useLocation,useParams} from "react-router-dom"
+import Pagination from '@material-ui/lab/Pagination';
+import { Navbar } from "../../Components/Navbar";
+import StarIcon from "@material-ui/icons/Star";
+const useStyles = makeStyles((theme) => ({
+   container: {
+    width:"100%",
+    minHeight:"100vh",
+    marginTop:"3.5rem",
+    display: "flex",
+    flexDirection:"column",
+    alignItems: "center"
+    
+   },
+   reviewcontainer:{
+       width:"80%",
+       minHeight:"inherit",
+       background:"#fff",
+       display: "flex",
+   },
+   pagination:{
+    width: "80%",
+    height: "10vh",
+    position: "fixed",
+    bottom: "0",
+    background: "#fff",
+    display:"flex",
+    justifyContent:"center",
+    alignItems: "center",
+   },
+   sidecontainer:{
+    width: "20% !important", 
+    height:"45vh",
+    borderBottom: "1px solid rgba(0,0,0,.1)"
+   },
+   details:{
+       display:"flex",
+       flexDirection:"column",
+       alignItems: "center",
+       justifyContent:"space-around",
+       height:"40vh"
+   },
+   allreview:{
+   width:"80%",
+    minHeight:"100vh",
+    display:"flex",
+    flexDirection:"column",
+    borderLeft:"1px solid rgba(0,0,0,.1)"
+   },
+   ratelist:{
+    listStyle: "none",
+    width:"25rem",
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"space-around"
+   },
+   ratting:{
+       display:"flex",
+       padding:"24px",
+       alignItems:"center"
+   }
+}))
+const GlobalCss = withStyles({
+    '@global':{
+        ".MuiPaginationItem-outlinedPrimary.Mui-selected": {
+            color:"#fff",
+            backgroundColor:"#2874f0"
+         },
+         ".MuiTypography-h6 ":{
+             width:"80%"
+         },
+         ".MuiLinearProgress-root":{
+             width:"15rem !important",
+            
+         },
+         ".MuiLinearProgress-barColorPrimary":{
+            backgroundColor:"green"
+         }
+    }
+   
+})(() => null)
 export const ProductPage = () => {
+    const classes = useStyles()
     const currentProduct = useParams().id;
     const [productdata,setProductdata] = useState()
     const [reviews,setReviews] = useState()
-    const [currentpage,setcurrentpage] = useState(1)
+    const [page,setPage] = useState(1)
   console.log(currentProduct)
     useEffect(() => {
         fetch(`/product/${currentProduct}`, {
@@ -43,17 +125,79 @@ export const ProductPage = () => {
         }
     },[productdata])
     console.log(reviews)
+    console.log(productdata)
+    const handleChange = (event,value) => {
+        setPage(value)
+    }
     return <>
-        {reviews ?(
-            <>
-                {reviews[currentpage].map((reviewcontent,i) => {
-                    return <>
+    <GlobalCss />
+    <Navbar />
+    <Box className={classes.container}>
+        <div className={classes.reviewcontainer}>
+            <div className={classes.sidecontainer}>
+                {productdata ? (<>
                     
-                        <h1>{reviewcontent.Comment}</h1>
-                    </>
-                })}
+                   <div className={classes.details}>
+                      <div style={{"textAlign":"center"}}>
+                      <img src={productdata[2].productImage} width="100px"  alt=""></img>
+                      </div>
+                   <Typography variant="h6" component="h6" >{productdata[0].productName.slice(0,70)}...</Typography>
+                   <Typography variant="body2">
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                background: "#388e3c",
+                                color: "#fff",
+                                padding: "0.1rem .4rem 0rem 0.6rem",
+                                borderRadius: "10px",
+                              }}
+                            >
+                              {productdata[5].productRatings[0].overallRating}{" "}
+                              <StarIcon style={{ height: "1.2rem" }} />
+                            </span>{" "}
+                            {productdata[5].productRatings[0].ratingCount}{" "}
+                            {productdata[5].productRatings[0].reviewCount}
+                          </Typography>
+                   </div>
+                  
+                </>):""}
+            </div>
+            <div className={classes.allreview}>
+               {productdata && reviews ? (<>
+                <div className={classes.header}>
+                    <Typography variant="h5" component="h2" style={{"borderBottom":"1px solid rgba(0,0,0,.1)","padding": "24px 0 24px 24px"}}>{productdata[0].productName} Reviews</Typography>
+
+                </div>
+                <div className={classes.ratting}>
+                    <div style={{"width":"10%"}}>
+                        <Typography variant="h5" display="flex" minHeight="5vh" flexDirection="column">{productdata[5].productRatings[0].overallRating} <StarIcon style={{ height: "1.2rem" }} /></Typography>
+                        <Typography variant="body2">{productdata[5].productRatings[0].ratingCount}{" "}
+                            {productdata[5].productRatings[0].reviewCount}</Typography>
+                    </div>
+                    <ul>
+                    {Object.keys(productdata[5].productRatings[1]).reverse().map((value,index) => {
+                        console.log(Math.round(parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[index].split(",").join(""))/parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[0].split(",").join(""))*100))
+                        return <> 
+                        
+                            <li className={classes.ratelist}>
+                                <Typography variant="h5">{value} <StarIcon style={{ height: "1.2rem" }} /></Typography>
+                                <LinearProgress variant="determinate" value={Math.round(parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[index].split(",").join(""))/parseFloat(Object.values(productdata[5].productRatings[1]).reverse()[0].split(",").join(""))*100)} ></LinearProgress>
+                                <Typography variant="body2">{Object.values(productdata[5].productRatings[1]).reverse()[index]}</Typography>
+                            </li>
+                        </>
+                    })}
+                    </ul>
+                </div>
+               </>):""}
+            </div>
             
-            </>
-        ):("")}
+        </div>
+        <div className={classes.pagination}>
+            {reviews ? (<>
+                <Pagination count={reviews.length} page={page} onChange={handleChange} variant="outlined" color="primary" />
+            </>):" "}
+        </div>
+    </Box>
+    
     </>
 }
