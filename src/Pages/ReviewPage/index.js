@@ -123,7 +123,6 @@ export const ReviewPage = () => {
         }
       });
   };
-
   const classes = useStyles();
 
   return (
@@ -197,8 +196,9 @@ export const ReviewPage = () => {
                             )}
                           </ul>
                         </div>
-                        <div>
-                          <Link to={`product/${productids[index]}`}>Check Review</Link>
+                        <div style={{"display":"flex","flexDirection":"column"}}>
+                          <Link to={`product/${productids[index]}`} style={{"textDecoration": "none","fontFamily":"Roboto","color":"#2874f0","padding":"1rem 0rem"}}>Check Review</Link>
+                          <Link to={item[1].productLink} target="_blank" style={{"textDecoration": "none","fontFamily":"Roboto","color":"#2874f0","padding":"1rem 0rem"}}>Buy Product</Link>
                         </div>
                       </div>
                       <hr style={{ opacity: ".2" }}></hr>
